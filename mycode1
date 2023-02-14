@@ -5,10 +5,10 @@ function process_jewelry(i)
     if x ~= -1 and y ~= -1 then
         print(jewelry[i].."这是要找的首饰")
         tingliu({1500,1800})
-        if jewelry[i] == "之翼" or jewelry[i] == "暗黑天使" or jewelry[i] == "血色天使" then    
-            local color_found, intX, intY = findColor(410,332,611,577,"1E7CA7-101010|259ED4-101010|2083AF-101010|185975-101010|196789-101010",0,0.6)
+        if jewelry[i] == "之翼" or jewelry[i] == "暗黑天使" or jewelry[i] == "血色天使" then    --定义套装和翅膀--下面findColor为属颜色
+            local color_found, intX, intY = findColor(410,332,611,577,"1E7CA7-101010|259ED4-101010|2083AF-101010|185975-101010|196789-101010",0,0.8)
             tingliu({1000,1200})
-            if intX>-1 and intY>-1 then
+            if color_found then
                 print("找到颜色，坐标为：", intX, intY)
                 tingliu({1300,1600})
                 tap(770,256)
