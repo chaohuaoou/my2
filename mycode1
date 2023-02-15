@@ -1,60 +1,88 @@
-function process_jewelry(i)
-    set_dict_files(i-1, dict_files1[i])
-    local x, y = -1, -1
-    local ret, x, y = findStr(480,162,686,234, jewelry[i], color_fmt1[i], 0.92)
-    if x ~= -1 and y ~= -1 then
-        print(jewelry[i].."这是要找的首饰")
-        tingliu({1500,1800})
-        if jewelry[i] == "之翼" or jewelry[i] == "暗黑天使" or jewelry[i] == "血色天使" then    --定义套装和翅膀--下面findColor为属颜色
-            local color_found, intX, intY = findColor(410,332,611,577,"1E7CA7-101010|259ED4-101010|2083AF-101010|185975-101010|196789-101010",0,0.8)
-            tingliu({1000,1200})
-            if color_found then
-                print("找到颜色，坐标为：", intX, intY)
-                tingliu({1300,1600})
-                tap(770,256)
-                tingliu({1400,1800})
-                local found = false
-                for k = 1, 2 do
-                    shangjia(k == 1)
-                    tingliu({3000,3500})
-                    found = shangjia(false)
-                    tingliu({300,500})
-                    if found then
-                        break
-                    end
-                end
-                return found 
-            end
-        else
-            local attr_found = false
-            for j=1, #attribute do
-                set_dict_files(j-1, dict_files[j])
-                local x, y = -1, -1
-                local ret, x, y = findStr(413,364,614,622, attribute[j], color_fmt[j], 0.92)
-                if x ~= -1 and y ~= -1 then
-                    print(attribute[j].."这是要找的属性")
-                    tingliu({1500,2000})
-                    tap(770,256)    ---点击最低价
-                    tingliu({1500,2000})
-                    local found = false
-                    for k = 1, 2 do
-                        shangjia(k == 1)      
-                        tingliu({3000,3500})
-                        found = shangjia(false)
-                        tingliu({300,500})
-                        if found then
-                            break
-                        end
-                    end
-                    return found
-                end
-            end
-            if not attr_found then
-                print("属性不对")
-                tingliu({500,800})
-                tap_random(792, 115,5,300,400)
-            end
+function runUI(flag)   ----ui界面运行
+	function onClickrun()
+    flag = true
+		sleep(200)
+	end
+	
+	function onClickrun1()
+		
+		function onClick1()
+			
+			sleep(200)
+			exitScript()
+		end
+        function 右边对齐()
+        ui.setGravity("tvId",5)
         end
-    end
-    return false
+		ui.newLayout("layout1", 650, 600)
+		ui.addTextView("layout1","tvId","3051")
+		ui.setTextSize("tvId",120)
+		ui.newRow("layout1","row1")
+		ui.addButton("layout1", "close_tuichu", "退出",150, 60)
+		ui.setOnClick("close_tuichu", "onClick1()")
+		ui.show("layout1", false)
+		while not flag do
+			sleep(300)
+		end
+	end
+	
+	ui.newLayout("layout1", 400, 350)
+	ui.addButton("layout1","run_yunxing","运行上架",300,200)
+	ui.newRow("layout1","row1")
+	ui.addButton("layout1","showzs","显示钻石",200,60)
+	ui.setOnClick("run_yunxing", "onClickrun()")
+	ui.setOnClick("showzs", "onClickrun1()")
+	ui.show("layout1", false)
+	sleep(1000)
+	
+	
+	while not flag do
+		sleep(300)
+	end
+end
+
+if runUI(flag) then
+	sleep(5000)
+	if myFindStr() then
+		local result = shibiewenzi()
+		if result ~= nil then
+			for i = 1, result do
+				tap_random(280,323,2,300,400)
+				tingliu({1200,1600})
+				xiajia()
+			end
+			if shangjiamoney() then
+				local should_break = false
+				for i = 1, 8 do
+					for j = 1, 9 do
+						local x = x1 + (j - 1) * grid_width + (grid_width / 2)
+						local y = y1 + (i - 1) * grid_height + (grid_height / 2)
+						tingliu({500,700})
+						tap_random(x, y,1,300,400)      --每个格子点击位置
+						tingliu({1500,1800})
+						local found = false
+						tingliu({300,500})
+						for i=1, #jewelry do
+							found = process_jewelry(i)
+							if found then
+								should_break = true
+								break
+							end
+						end
+						if not found then
+							print("不是我要找的")
+							tingliu({1000,1300})
+							tap_random(792, 115,5,300,400)
+						end
+						if found then
+							break
+						end
+					end
+					if found or should_break then
+						break
+					end
+				end
+			end
+		end
+	end
 end
