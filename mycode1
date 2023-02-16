@@ -5,13 +5,18 @@ local 最大生命颜色 = ("26A2DA-101010|25A2DA-101010|27A9E4-101010|2187B5-10
 local 伤害反射颜色 = ("26A2DA-101010|25A2DA-101010|27A9E4-101010|2187B5-101010|1D769D-101010|2496C9-101010")
 local 伤害减少颜色=("26A2DA-101010|25A2DA-101010|27A9E4-101010|2187B5-101010|1D769D-101010|2496C9-101010")
 local 防御成功率颜色=("26A2DA-101010|25A2DA-101010|27A9E4-101010|2187B5-101010|1D769D-101010|2496C9-101010")
+local 套装最大生命颜色=("25A3DC-101010|1B739B-101010|2295C8-101010|1D7FAC-101010|155978-101010")
+local 套装伤害减少颜色=("25A3DC-101010|1B739B-101010|2295C8-101010|1D7FAC-101010|155978-101010")
+local 套装防御成功率颜色=("25A3DC-101010|1B739B-101010|2295C8-101010|1D7FAC-101010|155978-101010")
+local 套装伤害反射颜色=("25A3DC-101010|1B739B-101010|2295C8-101010|1D7FAC-101010|155978-101010")
+
 
 local jewelry = {"之指环","之项链","之耳环","血色天使","暗黑天使","之翼"}
 local dict_files1 = {"zzh.txt","zxl.txt","zeh.txt","s1.txt","s1.txt","s1.txt"}
 local color_fmt1 = {"D223B7-101010|A41C8E-101010|B21E9A-101010","D223B7-101010|A41C8E-101010|B41E9C-101010","D223B7-101010|A41C8E-101010|B41E9C-101010","F26055-101010|C64F46-101010|AE463E-101010","C34D44-101010|DD574D-101010|F26055-101010|9A3D36-101010|AD453D-101010","9D8D34-101010|E6CE4A-101010|A09034-101010|CEB943-101010|BCA83D-101010"}
-local attribute = {"攻击速度","卓越一击率","攻击力","最大生命","伤害反射","伤害减少","防御成功率"}
-local dict_files = {"s1.txt", "s1.txt", "s1.txt", "s1.txt", "s1.txt", "s1.txt", "s1.txt"}
-local color_fmt = {攻击速度颜色,卓越一击率颜色,攻击力颜色,最大生命颜色,伤害反射颜色,伤害减少颜色,防御成功率颜色}
+local attribute = {"攻击速度","卓越一击率","攻击力","最大生命","伤害反射","伤害减少","防御成功率","套装最大生命","套装伤害减少","套装防御成功率","套装伤害反射"}
+local dict_files = {"s1.txt", "s1.txt", "s1.txt", "s1.txt", "s1.txt", "s1.txt", "s1.txt","s2.txt","s2.txt","s2.txt","s2.txt"}
+local color_fmt = {攻击速度颜色,卓越一击率颜色,攻击力颜色,最大生命颜色,伤害反射颜色,伤害减少颜色,防御成功率颜色,套装最大生命颜色,套装伤害减少颜色,套装防御成功率颜色,套装伤害反射颜色}
 local x1, y1, x2, y2 = 774, 183, 1120, 576
 local grid_width, grid_height = 40, 40
 
@@ -165,7 +170,7 @@ function process_jewelry(i)  --循环上架产品
 	if x ~= -1 and y ~= -1 then
 		print(jewelry[i].."这是要找的首饰")
 		tingliu({1500,1800})
-		if jewelry[i] == "之翼" or jewelry[i] == "血色天使" or jewelry[i] == "暗黑天使" then
+		if jewelry[i] == "之翼" or jewelry[i] == "暗黑天使" then
 			local color_found, intX, intY = findColor(410,332,611,577,"1B739A-101010|26A6DF-101010|238DBC-101010|2499CE-101010|1C7196-101010",0,0.9)
 			if intX>-1 and intY>-1 then
 				print("找到颜色，坐标为：", intX, intY)
@@ -179,9 +184,9 @@ function process_jewelry(i)  --循环上架产品
 					tingliu({3000,3500})
 					found = shangjia(false)
 					tingliu({300,500})
-					if found or (special_checked and jewelry[i] ~= "之翼" and jewelry[i] ~= "血色天使" and jewelry[i] ~= "暗黑天使") then
+					if found or (special_checked and jewelry[i] ~= "之翼") then
 						break
-					elseif jewelry[i] == "之翼" or jewelry[i] == "血色天使" or jewelry[i] == "暗黑天使" then
+					elseif jewelry[i] == "之翼" then
 						special_checked = true
 					end
 				end
