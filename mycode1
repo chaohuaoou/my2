@@ -178,16 +178,14 @@ function process_jewelry(i)  --循环上架产品
 				tap(770,256)
 				tingliu({1400,1800})
 				local found = false
-                local special_checked = false
 				for k = 1, 2 do
 					shangjia(k == 1)
 					tingliu({3000,3500})
 					found = shangjia(false)
 					tingliu({300,500})
-					if found or (special_checked and jewelry[i] ~= "之翼") then
+					count = count + 1
+					if found or count >= 2 then  -- 第二次执行后，直接跳出循环
 						break
-					elseif jewelry[i] == "之翼" then
-						special_checked = true
 					end
 				end
 			else
