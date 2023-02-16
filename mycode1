@@ -55,7 +55,7 @@ function set_dict_files(index, dict_files)  ---设置字库变量
 end
 
 function myFindStr()    ---打开交易行判断交易税是否存在，否则再打开一次
-	sleep(1000)      
+	sleep(1000)
 	tap_random(27, 23,1,200,250)   --点空白地方
 	tingliu({1300,1800})
 	tap_random(942, 113,2,300,400)  --点交易
@@ -168,20 +168,21 @@ function process_jewelry(i)  --循环上架产品
 		if jewelry[i] == "之翼" or jewelry[i] == "血色天使" or jewelry[i] == "暗黑天使" then
 			local color_found, intX, intY = findColor(410,332,611,577,"1B739A-101010|26A6DF-101010|238DBC-101010|2499CE-101010|1C7196-101010",0,0.9)
 			if intX>-1 and intY>-1 then
-				local number = getColorNum(410,332,611,577,"1E7CA6-101010|2393C5-101010|259FD6-101010|1D6E93-101010|195E7D-101010",0.8)
-				print(number)
 				print("找到颜色，坐标为：", intX, intY)
 				tingliu({1300,1600})
 				tap(770,256)
 				tingliu({1400,1800})
 				local found = false
+                local special_checked = false
 				for k = 1, 2 do
 					shangjia(k == 1)
 					tingliu({3000,3500})
 					found = shangjia(false)
 					tingliu({300,500})
-					if found then
+					if found or (special_checked and jewelry[i] ~= "之翼" and jewelry[i] ~= "血色天使" and jewelry[i] ~= "暗黑天使") then
 						break
+					elseif jewelry[i] == "之翼" or jewelry[i] == "血色天使" or jewelry[i] == "暗黑天使" then
+						special_checked = true
 					end
 				end
 			else
@@ -242,15 +243,15 @@ function closeUI(exitScript)   ----ui界面退出
 	end
 end
 
-function zuanshi(str)   
-sleep(500)   
-setDict(0,"s1.txt") 
-useDict(0)
-local str = ocr(241,585,309,608,"F5D491-101010|837352-101010|E0C285-101010|AF986A-101010|C6AC77-101010|6A5E44-101010",0.90)
-if str ~= nil then
-print(str)
-return str 
-end
+function zuanshi(str)
+	sleep(500)
+	setDict(0,"s1.txt")
+	useDict(0)
+	local str = ocr(241,585,309,608,"F5D491-101010|837352-101010|E0C285-101010|AF986A-101010|C6AC77-101010|6A5E44-101010",0.90)
+	if str ~= nil then
+		print(str)
+		return str
+	end
 end
 
 function onClickrun1()
@@ -267,8 +268,8 @@ function onClickrun1()
 	ui.addButton("layout1", "close_tuichu", "退出",150, 60)
 	ui.setOnClick("close_tuichu", "onClick1()")
 	ui.show("layout1", false)
-
-    	sleep(1000)
+	
+	sleep(1000)
 	while not flag do
 		sleep(300)
 	end
@@ -324,9 +325,9 @@ function onClickrun()
 				end
 			end
 		end
-        
+		
 	end
-
+	
 end
 
 function runUI(flag)
