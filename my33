@@ -1,98 +1,141 @@
-function closeUI(exitScript)   ----弹出ui界面并终止脚本
-	function onClick()
-		exitScript()
-	end
-	
-	ui.newLayout("layout1", 500, 300)
-	ui.addButton("layout1", "close_tuichu", "完成退出", 400, 200)
-	ui.setTextSize("close_tuichu",20)
-	ui.setOnClick("close_tuichu", "onClick()")
-	ui.setTextColor("close_tuichu","#ff000000")
-	ui.setBackground("close_tuichu","#ffffffff")
-	ui.show("layout1", false)
-	
-	sleep(1000)
-	
-	while not flag do
-		sleep(300)
+local boss_name = {"海魔希特拉", "魔王扎坎"}
+
+function find_boss_name()    ---定义识别boss名称
+	setDict(0,"s2.txt")
+	useDict(0)
+	local ret,x, y = findStr(45,49,259,107, "海魔希特拉|魔王扎坎","EB2020-101010|B61919-101010|C91C1C-101010|A21717-101010|911414-101010|7F1212-030303",0.8)
+	if x ~= -1 and y ~= -1 then
+    	print("出现boss名称为:"..ret.."已打完该boss")
+		return true
+	else
+    print("未出现boss名称:"..ret)
+		return false
 	end
 end
 
+function open_challenge_boss()   --打开挑战界面并识别次数进入挑战boss地图
+	setDict(0,"s2.txt")
+	useDict(0)
+	sleep(2000)
+	tap(1025, 101)
+	sleep(2000)
+	tap(372, 157)
+	sleep(2000)
+	local ret, x, y = findStr(955, 144, 1097, 181, "t0|t1|t2|t3|t4|t5", "A87E20-101010|A4A453-101010|DCCC64-101010|B8B69D-101010|E1BF35-101010|B18829-101010|DCBF7A-101010|9B8B6B-101010|896C12-101010|C39E45-404040|EDE198-404040|534223-101010|B9A983-101010|B9A983-101010|9F8F67-505050",0.86)
+	if x ~= -1 and y ~= -1 then
+		local challenge_left = tonumber(ret)
+		print("挑战boss次数为:"..challenge_left)
+		if challenge_left and challenge_left > 0 then
+			tap(293, 288)
+			sleep(1000)
+			tap(542, 522)
+			return true
+		end
+	end
+	sleep(1000)
+	tap(1112, 112)
+	return false
+end
 
+function record_start_feature()     ---识别开始挑战前地图名称
+sleep(2000)
+	setDict(0,"s2.txt")
+	useDict(0)
+	local ret,x, y = findStr(1075,1,1160,28, "勇者大陆","B1B5B8-101010|7B7E80-101010|919496-101010|BBBFC2-101010|B1B5B8-101010|BEC2C6-101010", 0.86)
+	if x ~= -1 and y ~= -1 then
+    print("开始地图为:"..ret)
+		return true
+	else
+		return false
+	end
+end
 
-local clicked = false
+function is_in_fighting_boss()   --判断是否正在打boss
+sleep(1000)
+	setDict(0,"s2.txt")
+	useDict(0)
+	local ret ,x, y = findStr(83, 237, 171, 270, "伤害第一可","EB7F00-101010|CF7000-101010|9C5500-101010|BD6701-101010|8C4C00-050505",0.9)
+	if x ~= -1 and y ~= -1 then
+    print("识别到："..ret.."正在打boss")
+		return true
+	else
+		return false
+	end
+    sleep(1000)
+end
 
-function onClickrun()
-	print("请手动点击屏幕以继续...")
-	-- 等待用户点击屏幕
-	clicked = true
-	ui.dismiss("layout1")
-	sleep(200)
-	
-	if myFindStr() then
-		local result = shibiewenzi()
-		if result ~= nil then
-			for i = 1, result do
-				tap_random(280,323,2,300,400)
-				tingliu({1200,1600})
-				xiajia()
-			end
-			if shangjiamoney() then
-				local should_break = false
-				for i = 1, 8 do
-					for j = 1, 9 do
-						local x = x1 + (j - 1) * grid_width + (grid_width / 2)
-						local y = y1 + (i - 1) * grid_height + (grid_height / 2)
-						tingliu({500,700})
-						tap_random(x, y,1,300,400)      --每个格子点击位置
-						tingliu({1500,1800})
-						local found = false
-						tingliu({300,500})
-						for i=1, #jewelry do
-							found = process_jewelry(i)
-							if found then
-								should_break = true
-								break
-							end
-						end
-						if not found then
-							print("不是我要找的")
-							tingliu({1000,1300})
-							tap_random(792, 115,5,300,400)
-						end
-						if found then
-							break
-						end
-					end
-					if found or should_break then
-						break
-					end
+function is_finish_boss()  
+sleep(1000) 
+	setDict(0,"s2.txt")
+	useDict(0)
+	local ret,x, y = findStr(45,49,259,107, "海魔希特拉|魔王扎坎","EB2020-101010|B61919-101010|C91C1C-101010|A21717-101010|911414-101010|7F1212-030303",0.8)
+	if x ~= -1 and y ~= -1 then
+    print("识别到名称"..ret.."出现该名称，判断打完boss")
+		return true
+	else
+		return false
+	end
+end
+
+function is_character_dead()   ---如果角色死亡点击复活
+	setDict(0,"s2.txt")
+	useDict(0)
+	local ret,x, y = findStr(691, 426, 784, 453, "原地复活","C7C9CA-101010|B8B3AD-101010|BAA89A-101010|D3D7DB-101010|A09790-050505",0.9)
+	if x ~= -1 and y ~= -1 then
+    print("角色死亡点击："..ret)
+		tap(540, 437)
+		sleep(2000)
+		tap(26, 25)
+		sleep(2000)
+		tap(26, 25)
+		sleep(2000)
+		return true
+	else
+		return false
+	end
+end
+
+function challenge_boss()
+	if not open_challenge_boss() then
+		return false
+	end
+	local boss_fight_times = 0
+	while true do
+		if is_in_fighting_boss() then
+			if is_finish_boss() then
+				boss_fight_times = boss_fight_times + 1
+				print("挑战成功："..boss_fight_times)
+				if boss_fight_times == challenge_left then
+					break
 				end
+				sleep(5000)
+				tap(1112, 112)
+				sleep(5000)
+				open_challenge_boss()
+			end
+			setDict(0,"s2.txt")
+			useDict(0)
+			if findStr(691, 426, 784, 453, "原地复活","C7C9CA-101010|B8B3AD-101010|BAA89A-101010|D3D7DB-101010|A09790-050505",0.9) ~= -1 then
+				tap(540, 437)
+				sleep(2000)
+				tap(26, 25)
+				sleep(2000)
+				tap(26, 25)
+				sleep(5000)
+				open_challenge_boss()
 			end
 		end
-		
+        sleep(100)
 	end
-	
-end
-
-function runUI(flag)
-	-- 创建UI布局
-	ui.newLayout("layout1", 400, 350)
-	ui.addButton("layout1","run_yunxing","运行上架",300,200)
-	ui.newRow("layout1","row1")
-	ui.addButton("layout1","showzs","显示钻石",200,60)
-	ui.setOnClick("run_yunxing", "onClickrun()")
-	ui.setOnClick("showzs", "onClickrun1()")
-	ui.show("layout1", false)
-	
-	-- 等待用户点击屏幕
-	while not clicked do
-		sleep(500)
+	while true do
+		setDict(0,"s2.txt")
+		useDict(0)
+		if findStr(1075,1,1160,28, "勇者大陆","B1B5B8-101010|7B7E80-101010|919496-101010|BBBFC2-101010|B1B5B8-101010|BEC2C6-101010", 0.86) ~= -1 then
+			print("成功挑战boss，完成")
+			break
+		end
 	end
 end
 
-function main()
-	runUI(false)
-end
-
-main()
+challenge_left = 5  -- 填写需要挑战的次数
+challenge_boss()  -- 调用主函数进行挑战
