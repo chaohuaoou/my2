@@ -1,356 +1,211 @@
-local 攻击速度颜色 = ("26A2DA-101010|25A2DA-101010|27A9E4-101010|2187B5-101010|1D769D-101010|2496C9-101010")
-local 卓越一击率颜色 = ("26A2DA-101010|25A2DA-101010|27A9E4-101010|2187B5-101010|1D769D-101010|2496C9-101010")
-local 攻击力颜色 = ("26A2DA-101010|25A2DA-101010|27A9E4-101010|2187B5-101010|1D769D-101010|2496C9-101010")
-local 最大生命颜色 = ("26A2DA-101010|25A2DA-101010|27A9E4-101010|2187B5-101010|1D769D-101010|2496C9-101010")
-local 伤害反射颜色 = ("26A2DA-101010|25A2DA-101010|27A9E4-101010|2187B5-101010|1D769D-101010|2496C9-101010")
-local 伤害减少颜色=("26A2DA-101010|25A2DA-101010|27A9E4-101010|2187B5-101010|1D769D-101010|2496C9-101010")
-local 防御成功率颜色=("26A2DA-101010|25A2DA-101010|27A9E4-101010|2187B5-101010|1D769D-101010|2496C9-101010")
-local 套装最大生命颜色=("25A3DC-101010|1B739B-101010|2295C8-101010|1D7FAC-101010|155978-101010")
-local 套装伤害减少颜色=("25A3DC-101010|1B739B-101010|2295C8-101010|1D7FAC-101010|155978-101010")
-local 套装防御成功率颜色=("25A3DC-101010|1B739B-101010|2295C8-101010|1D7FAC-101010|155978-101010")
-local 套装伤害反射颜色=("25A3DC-101010|1B739B-101010|2295C8-101010|1D7FAC-101010|155978-101010")
-
-
-local jewelry = {"之指环","之项链","之耳环","血色天使","暗黑天使","之翼"}
-local dict_files1 = {"zzh.txt","zxl.txt","zeh.txt","s1.txt","s1.txt","s1.txt"}
-local color_fmt1 = {"D223B7-101010|A41C8E-101010|B21E9A-101010","D223B7-101010|A41C8E-101010|B41E9C-101010","D223B7-101010|A41C8E-101010|B41E9C-101010","F26055-101010|C64F46-101010|AE463E-101010","C34D44-101010|DD574D-101010|F26055-101010|9A3D36-101010|AD453D-101010","9D8D34-101010|E6CE4A-101010|A09034-101010|CEB943-101010|BCA83D-101010"}
-local attribute = {"攻击速度","卓越一击率","攻击力","最大生命","伤害反射","伤害减少","防御成功率","套装最大生命","套装伤害减少","套装防御成功率","套装伤害反射"}
-local dict_files = {"s1.txt", "s1.txt", "s1.txt", "s1.txt", "s1.txt", "s1.txt", "s1.txt","s2.txt","s2.txt","s2.txt","s2.txt"}
-local color_fmt = {攻击速度颜色,卓越一击率颜色,攻击力颜色,最大生命颜色,伤害反射颜色,伤害减少颜色,防御成功率颜色,套装最大生命颜色,套装伤害减少颜色,套装防御成功率颜色,套装伤害反射颜色}
-local x1, y1, x2, y2 = 774, 183, 1120, 576
-local grid_width, grid_height = 40, 40
-
-
-
-function tingliu(time)   --随机停留时间tingliu({500,1000}) tingliu({})
-	local randomTime = math.random(time[1], time[2])
-	sleep(randomTime)
-end
-
-function tap_random(x, y, range_percentage, min_duration, max_duration)  --定义随机点击位置和松开时间-tap_random(坐标, 偏移百分比, ,松开时间) tap_random(28, 26,1,300,400)
-	local gesture = Gesture:new() -- 创建一个手势对象
-	local path = Path:new() -- 创建一条路径
-	-- 计算随机偏移的半径
-	local range = math.floor(range_percentage * 0.01 * math.min(x, y))
-	-- 计算随机的坐标
-	local random_x = math.floor(x + 0.5 + math.random(-range, range))
-	local random_y = math.floor(y + 0.5 + math.random(-range, range))
-	-- 计算随机的按下时间
-	local random_duration = math.floor(min_duration + (max_duration - min_duration) * math.random())
-	-- 添加按下和松开的路径
-	path:setStartTime(0)
-	path:setDurTime(random_duration)
-	path:addPoint(random_x, random_y)
-	gesture:addPath(path)
-	
-	function onFinishEvent(type) -- 回调函数
-	end
-	
-	local r = gesture:dispatch(onFinishEvent)
-	if r then
-		print("点击成功")
-	else
-		print("执行失败")
-	end
-end
-
-function set_dict_files(index, dict_files)  ---设置字库变量
-	setDict(index, dict_files)
-	useDict(index)
-end
-
-function myFindStr()    ---打开交易行判断交易税是否存在，否则再打开一次
-	sleep(1000)
-	tap_random(27, 23,1,200,250)   --点空白地方
-	tingliu({1300,1800})
-	tap_random(942, 113,2,300,400)  --点交易
-	tingliu({1600,2000})
-	tap(496,152)                    --点击我的上架
-	tingliu({1300,1500})
-	
-	setDict(0, "s1.txt")
+function open_challenge_boss()   --打开挑战界面并识别次数进入挑战boss地图
+	print("执行open_challenge_boss()")
+	tingliu({1500,1800})
+	tap(26,26,1,300,350)
+	tingliu({1000,1200})
+	print("开始操作tiaozhaoboss()")
+	setDict(0,"s2.txt")
 	useDict(0)
-	local params = {596,91,691,131,"交易行","E2D3C4-101010|ACA786-101010|C3B6A9-101010|AFAC9B-101010|CABFA3-101010|A49382-101010",0.8}
-	local x, y = -1, -1
-	ret,x,y = findStr(params[1], params[2], params[3], params[4], params[5], params[6], params[7])
-	if x ~= -1 and y ~= -1 then
-		print(ret,x,y)
-		tingliu({1200,1500})
-		return true
+	if tiaozhaoboss()then --点击挑战Boss
+		
+		tingliu({1500,1700})
+		tap_random(365, 160,2,300,350)       --弹出挑战boss界面后点秘境boss
 	else
-		while true do
-			ret,x, y = findStr(params[1], params[2], params[3], params[4], params[5], params[6], params[7])
-			if x ~= -1 and y ~= -1 then
-				return true
-			end
-			tingliu({500,600})
-			tap_random(27, 23,1,200,250)     --点空白地方
-			tingliu({1300,1800})
-			tap_random(1023,26,1,300,400)    --点切换
-			tingliu({1300,1800})
-			tap_random(942, 113,2,300,400)   --点交易
-			tingliu({1600,2000})
-			tap(496,152)                     --点我的上架
+		print("开始操作while not tiaozhaoboss()")
+		while not tiaozhaoboss() do
 			tingliu({1300,1500})
+			tap_random(26,26,1,300,350)
+			tingliu({200,250})
+			tap_random(26,26,1,300,350)
+			tingliu({1300,1500})
+			tap_random(1026,27,1,300,350)
+			tingliu({1300,1500})
+			useDict(0)
+			tiaozhaoboss()
+			break
 		end
+		tingliu({1300,1500})
+		tap_random(365, 160,2,300,350)  --弹出挑战boss界面后点秘境boss
 	end
-end
-
-function shibiewenzi()     ---识别交易行中的货架数字
-	setDict(0,"s1.txt")
+	tingliu({1500,1800})
 	useDict(0)
-	local x, y = -1, -1
-	local ret, x, y = findStr(481,189,510,219,"s0|s1|s2|s3|s4|s5|s6","C5CACD-101010|808385-101010|A8ABAE-101010|D6DADE-101010",0.8)
+	local ret, x, y = find_str(955, 144, 1097, 181, "t0|t1|t2|t3|t4|t5", "A87E20-101010|A4A453-101010|DCCC64-101010|B8B69D-101010|E1BF35-101010|B18829-101010|DCBF7A-101010|9B8B6B-101010|896C12-101010|C39E45-404040|EDE198-404040|534223-101010|B9A983-101010|B9A983-101010|9F8F67-505050", 0.86)
 	if x ~= -1 and y ~= -1 then
-		local num = ret
-		print(num)
-		return num
+		challenge_left = tonumber(ret)
+		print("挑战boss次数为:"..challenge_left)
+		if challenge_left > 0 then
+			useDict(0)
+			haimo()     --点海魔
+			tingliu({1200,1400})
+			tap_random(759, 522,3,300,350)     --点中间
+			return challenge_left
+		end
 	else
-		print("识别不了数字，终止")
+		print("识别不了挑战boss次数字符")
 	end
-	
+	tingliu({200,300})
+	return false
 end
 
-function shangjiamoney()   ---上架金币
-	tingliu({1000,1300})
-	tap_random(817,230,3,250,320)   ---点金币
-	tingliu({1200,1400})
-	tap_random(817,223,2,250,320)   ---点数量到最低
-	tingliu({1200,1400})
-	tap(772,348)                    ---点最低价
-	tingliu({1200,1400})
-	local x=-1
-	local y=-1
-	ret,x,y=findPic(769,188,972,538,"sj.png|sj1.png|sj2.png|sj3.png","101010",0,0.8)
-	if x~=-1 and y ~=-1 then
-		print("找到坐标："..x,y)
-		tap_random(x,y,2,250,320)
-		print(tap_random(x,y))
-		print("点上架")
-	end
-	return true
-end
-
-function shangjia(tap_first)  --process_jewelry(i)函数调用专用上架
-	local x=-1
-	local y=-1
-	ret,x,y=findPic(769,188,972,538,"sj.png|sj1.png|sj2.png|sj3.png","101010",0,0.8)
-	if x~=-1 and y ~=-1 then
-		print("找到坐标："..x,y)
-		if tap_first then
-			tap_random(x+29,y+13,2,250,320)
-			print(tap_random(x,y))
-			print("点上架")
-		end
-		return true
-	end
-end
-
-function xiajia()  --点下架文字
-	for i = 1, 1 do
-		setDict(0,"s1.txt")
-		useDict(0)
-		local x=-1 y=-1
-		ret,x,y = findStr(771,184,1123,579,"下架","DADEE2-101010|C9C7C6-101010|B8B5B1-101010|91867D-101010|A9A29B-020202|A6A5A3-050505|A19A94-101010",0.8)
-		if x ~= -1 and y ~= -1 then
-			print("找到坐标："..x,y)
-			tingliu({1300,1800})
-			tap_random(x,y,2,300,400)
+function is_in_fighting_boss()   --判断是否正在打boss
+	print("正在判断是否正在打boss")
+	useDict(dictIndex)
+	tingliu({300,400})
+	local start_time = os.time()
+	while (os.time() - start_time) < 5 do -- 设置最大等待时间为 5 秒
+		类_图色.刷新屏幕()
+		local ret, x, y = find_str(83, 237, 171, 270, "伤害第一可", "EB7F00-101010|CF7000-101010|9C5500-101010|BD6701-101010|8C4C00-050505", 0.9)
+		-- 判断是否存在 "logo1.png"
+		local 设置={"logo1.png",0.8,522,14,578,70,"101010"}
+		
+		-- 如果两个条件都成立，则可以确定正在打boss
+		if x ~= -1 and y ~= -1 and 类_图色.找图(设置) then
+			print("正在打boss")
+			tingliu({1000,1200})
+			return true
 		else
-			print("文字不存在")
-		end
-	end
-	tingliu({1800,2100})
-end
-
-function process_jewelry(i)  --循环上架产品
-	set_dict_files(i-1, dict_files1[i])
-	local x, y = -1, -1
-	local ret, x, y = findStr(480,162,686,234, jewelry[i], color_fmt1[i], 0.92)
-	if x ~= -1 and y ~= -1 then
-		print(jewelry[i].."这是要找的首饰")
-		tingliu({1500,1800})
-		if jewelry[i] == "之翼" or jewelry[i] == "暗黑天使" then
-			local color_found, intX, intY = findColor(410,332,611,577,"1B739A-101010|26A6DF-101010|238DBC-101010|2499CE-101010|1C7196-101010",0,0.9)
-			if intX>-1 and intY>-1 then
-				print("找到颜色，坐标为：", intX, intY)
-				tingliu({1300,1600})
-				tap(770,256)
-				tingliu({1400,1800})
-				local found = false
-				for k = 1, 2 do
-					shangjia(k == 1)
-					tingliu({3000,3500})
-					found = shangjia(false)
-					tingliu({300,500})
-					count = count + 1
-					if found or count >= 2 then  -- 第二次执行后，直接跳出循环
-						break
-					end
-				end
-			else
-				print("没有找到")
-				return found
-			end
-		else
-			local attr_found = false
-			for j=1, #attribute do
-				set_dict_files(j-1, dict_files[j])
-				local x, y = -1, -1
-				local ret, x, y = findStr(410,378,595,648, attribute[j], color_fmt[j], 0.92)
-				if x ~= -1 and y ~= -1 then
-					print(attribute[j].."这是要找的属性")
-					tingliu({1500,2000})
-					tap(770,256)    ---点击最低价
-					tingliu({1500,2000})
-					local found = false
-					for k = 1, 2 do
-						shangjia(k == 1)
-						tingliu({3000,3500})
-						found = shangjia(false)
-						tingliu({300,500})
-						if found then
-							break
-						end
-					end
-					return found
-				end
-			end
-			if not attr_found then
-				print("属性不对")
-				tingliu({500,800})
-				tap_random(792, 115,5,300,400)
-			end
+			print("没有找到:"..x..y)
+			tingliu({1000,1200})
 		end
 	end
 	return false
 end
 
-function closeUI(exitScript)   ----ui界面退出
-	function onClick()
-		exitScript()
-	end
-	
-	ui.newLayout("layout1", 500, 300)
-	ui.addButton("layout1", "close_tuichu", "完成退出", 400, 200)
-	ui.setTextSize("close_tuichu",20)
-	ui.setOnClick("close_tuichu", "onClick()")
-	ui.setTextColor("close_tuichu","#ff000000")
-	ui.setBackground("close_tuichu","#ffffffff")
-	ui.show("layout1", false)
-	
-	sleep(1000)
-	
-	while not flag do
-		sleep(300)
-	end
-end
-
-function zuanshi(str)
-	sleep(500)
-	setDict(0,"s1.txt")
-	useDict(0)
-	local str = ocr(241,585,309,608,"F5D491-101010|837352-101010|E0C285-101010|AF986A-101010|C6AC77-101010|6A5E44-101010",0.90)
-	if str ~= nil then
-		print(str)
-		return str
-	end
-end
-
-function onClickrun1()
-	
-	function onClick1()
-		
-		sleep(200)
-		exitScript()
-	end
-	ui.newLayout("layout1", 650, 600)
-	ui.addTextView("layout1","tvId",zuanshi(str))
-	ui.setTextSize("tvId",120)
-	ui.newRow("layout1","row1")
-	ui.addButton("layout1", "close_tuichu", "退出",150, 60)
-	ui.setOnClick("close_tuichu", "onClick1()")
-	ui.show("layout1", false)
-	
-	sleep(1000)
-	while not flag do
-		sleep(300)
-	end
-end
-
-local clicked = false
-
-function onClickrun()
-	print("请手动点击屏幕以继续...")
-	-- 等待用户点击屏幕
-	clicked = true
-	ui.dismiss("layout1")
-	sleep(200)
-	
-	if myFindStr() then
-		local result = shibiewenzi()
-		if result ~= nil then
-			for i = 1, result do
-				tap_random(280,323,2,300,400)
-				tingliu({1200,1600})
-				xiajia()
-			end
-			if shangjiamoney() then
-				local should_break = false
-				for i = 1, 8 do
-					for j = 1, 9 do
-						local x = x1 + (j - 1) * grid_width + (grid_width / 2)
-						local y = y1 + (i - 1) * grid_height + (grid_height / 2)
-						tingliu({500,700})
-						tap_random(x, y,1,300,400)      --每个格子点击位置
-						tingliu({1500,1800})
-						local found = false
-						tingliu({300,500})
-						for i=1, #jewelry do
-							found = process_jewelry(i)
-							if found then
-								should_break = true
-								break
-							end
-						end
-						if not found then
-							print("不是我要找的")
-							tingliu({1000,1300})
-							tap_random(792, 115,5,300,400)
-						end
-						if found then
-							break
-						end
-					end
-					if found or should_break then
-						break
-					end
-				end
+function is_finish_boss(is_boss_finished, is_boss_finished_last)
+	print("正在判断是否已经打完boss")
+	tingliu({200,300})
+	类_图色.刷新屏幕()
+	local 设置 = {"logo3.png", 0.8, 57,59,157,90, "101010"}
+	local times = 0
+	local max_wait_time = 2  -- 设置最大等待时间为 2 秒
+	local start_time = os.time()
+	while (os.time() - start_time) < max_wait_time do
+		if 类_图色.找图(设置) then
+			print("出现该名称，判断打完boss")
+			tingliu({1000,1200})
+			is_boss_finished = true -- 更新is_boss_finished的值
+			return true
+		else
+			if is_boss_finished then -- 已经打过了
+				tingliu({1000,1200})
 			end
 		end
-		
+		tingliu({500,600})
+	end
+	print("超时，未找到打完Boss的特征")
+	return false
+end
+function is_character_dead()
+	useDict(dictIndex)
+	local ret, x, y = find_str(691, 426, 784, 453, "原地复活", "C7C9CA-101010|B8B3AD-101010|BAA89A-101010|D3D7DB-101010|A09790-050505", 0.9)
+	if x ~= -1 and y ~= -1 then
+		print("角色死亡点击："..ret)
+		tap_random(540, 437,2,300,340)
+		tingliu({2000,2300})
+		tap_random(26, 25,1,300,350)
+		tingliu({2000,2300})
+		tap_random(26, 25,1,300,350)
+		tingliu({2000,2300})
+		return true
+	else
+		return false
+	end
+end
+
+function challenge_boss()
+	print("执行challenge_boss()")
+	tingliu({4000,4500})
+	if not open_challenge_boss() then
+		return false
 	end
 	
-end
-
-function runUI(flag)
-	-- 创建UI布局
-	ui.newLayout("layout1", 400, 350)
-	ui.addButton("layout1","run_yunxing","运行上架",300,200)
-	ui.newRow("layout1","row1")
-	ui.addButton("layout1","showzs","显示钻石",200,60)
-	ui.setOnClick("run_yunxing", "onClickrun()")
-	ui.setOnClick("showzs", "onClickrun1()")
-	ui.show("layout1", false)
+	local boss_fight_times = 0
+	local is_finished = false
+	local is_fighting_boss = false
+	local is_boss_finished = false  -- 是否已经完成挑战
+	local is_boss_finished_last = false -- 上次是否已经完成挑战
+	while not is_in_fighting_boss() do
+		tingliu({1000,1200})
+	end
 	
-	-- 等待用户点击屏幕
-	while not clicked do
-		sleep(500)
+	while not is_finished do
+		if not is_fighting_boss or is_in_fighting_boss() then
+			is_fighting_boss = true
+			tingliu({500,600})
+			if is_character_dead() then
+				print("角色已死亡，重新开始挑战")
+				tingliu({1800,2000})
+				setDict(dictIndex,dictName)
+				useDict(dictIndex)
+				open_challenge_boss()
+			end
+			is_boss_finished = is_finish_boss(is_boss_finished, is_boss_finished_last)
+			if is_boss_finished then
+				if not is_boss_finished_last then -- 只有第一次识别到boss结束特征才算挑战成功
+					boss_fight_times = boss_fight_times + 1
+					print("挑战成功："..boss_fight_times)
+					tingliu({1100,1200})
+					if boss_fight_times == challenge_left then
+						print("挑战次数"..challenge_left)
+						print("挑战次数已用完，等待退出")
+						tingliu({1000,1300})
+						tap_random(26,26,1,300,350)
+						tingliu({300,400})
+						tap_random(26,26,1,300,350)
+						tingliu({1000,1200})
+						tap_random(354,234,1,300,350)
+						tingliu({1000,1200})
+						tap_random(738,417,1,300,350)
+						tingliu({4000,4500})
+						is_finished = true -- 设置变量，以便程序可以继续进入下一个循环
+					end
+					is_boss_finished_last = true
+				end
+			else
+				is_boss_finished_last = false
+				print("未找到boss结束标志")
+				tingliu({500,600})
+			end
+		else
+			is_boss_finished = is_finish_boss()
+			if is_boss_finished then
+				if not is_boss_finished_last then -- 只有第一次识别到boss结束特征才算挑战成功
+					boss_fight_times = boss_fight_times + 1
+					print("挑战成功："..boss_fight_times)
+					tingliu({1200,1400})
+					if boss_fight_times == challenge_left then
+						print("挑战次数"..challenge_left)
+						print("挑战次数已用完，等待退出")
+						tingliu({1000,1300})
+						tap_random(26,26,1,300,350)
+						tingliu({300,400})
+						tap_random(26,26,1,300,350)
+						tingliu({1000,1200})
+						tap_random(354,234,1,300,350)
+						tingliu({1000,1200})
+						tap_random(738,417,1,300,350)
+						tingliu({4000,4500})
+						is_finished = true -- 设置变量，以便程序可以继续进入下一个循环
+					end
+					is_boss_finished_last = true
+				end
+			else
+				is_boss_finished_last = false
+				print("未找到boss结束标志")
+				tingliu({1100,1300})
+			end
+		end
+		if is_character_dead() then
+			print("角色死亡，重新开始挑战")
+			tingliu({1800,2000})
+			setDict(dictIndex,dictName)
+			useDict(dictIndex)
+			open_challenge_boss()
+		end
+	end
+	if is_boss_finished or is_finish_boss(is_boss_finished, is_boss_finished_last) then
+		boss_fight_times = boss_fight_times + 1
+		print("挑战成功："..boss_fight_times)
+		tingliu({1000,1200})
 	end
 end
-
-function main()
-	runUI(false)
-end
-
-main()
