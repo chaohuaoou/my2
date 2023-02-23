@@ -8,63 +8,115 @@ dictName = "s2.txt"
 setDict(dictIndex, dictName)
 useDict(dictIndex)
 
-function haimo()      --点击挑战boss界面中海魔希特拉
+--[===[function set_dict_files(index, dict_files)  ---设置字库变量
+setDict(index, dict_files)
+useDict(index)
+end]===]
+function tingliu(time)   --随机停留时间tingliu({500,1000}) tingliu({})
+	local randomTime = math.random(time[1], time[2])
+	sleep(randomTime)
+end
 
+function tap_random(x, y, range_percentage, min_duration, max_duration)  --定义随机点击位置和松开时间-tap_random(坐标, 偏移百分比, ,松开时间) tap_random(28, 26,1,300,400)
+	local gesture = Gesture:new() -- 创建一个手势对象
+	local path = Path:new() -- 创建一条路径
+	-- 计算随机偏移的半径
+	local range = math.floor(range_percentage * 0.01 * math.min(x, y))
+	-- 计算随机的坐标
+	local random_x = math.floor(x + 0.5 + math.random(-range, range))
+	local random_y = math.floor(y + 0.5 + math.random(-range, range))
+	-- 计算随机的按下时间
+	local random_duration = math.floor(min_duration + (max_duration - min_duration) * math.random())
+	-- 添加按下和松开的路径
+	path:setStartTime(0)
+	path:setDurTime(random_duration)
+	path:addPoint(random_x, random_y)
+	gesture:addPath(path)
+	
+	function onFinishEvent(type) -- 回调函数
+	end
+	
+	local r = gesture:dispatch(onFinishEvent)
+	if r then
+		print("点击成功")
+	else
+		print("执行失败")
+	end
+end
+
+
+function haimo(acc)      --点击挑战boss界面中海魔希特拉
 	local x=-1 y=-1
 	ret,x,y=find_str(169,184,360,599,"挑战海魔希特拉","B2B3AA-292D3A",0.85)
 	if x~=-1 and y ~=-1 then
 		tingliu({1200,1400})
 		tap_random(x,y,2,300,350)
 		return true
+        else
+        return acc
 	end
 end
 
-function tiaozhaoboss()      --点挑战boss文字
 
-	local x=-1 y=-1
-	ret,x,y=find_str(984,127,1069,152,"挑战boss","9E8C6D-544F4D",0.55)
-	if x~=-1 and y ~=-1 then
-		tingliu({1200,1400})
-		tap_random(x,y,2,300,350)
-		return true
-	end
+--点挑战boss文字
+function tiaozhaoboss()
+    local max_attempts = 3
+    local attempts = 0
+    while attempts < max_attempts do
+        local x, y = find_str(984, 127, 1069, 152, "挑战boss", "9E8C6D-544F4D", 0.55)
+        if x ~= -1 and y ~= -1 then
+            tingliu({1200, 1400})
+            tap_random(1022, 102, 2, 300, 350)
+            return true
+        else
+            tingliu({1300, 1500})
+            tap_random(26, 26, 1, 300, 350)
+            tingliu({200, 250})
+            tap_random(26, 26, 1, 300, 350)
+            tingliu({1300, 1500})
+            tap_random(1026, 27, 1, 300, 350)
+            tingliu({1300, 1500})
+            useDict(dictIndex)
+            attempts = attempts + 1
+        end
+    end
+    return false
 end
+
+
+
+stack = {"wait_boss"}
 
 function reopen_challenge_boss()
-    open_challenge_boss()
-    table.insert(stack, "wait_boss")
+	open_challenge_boss()
+	table.insert(stack, "wait_boss")
 end
-
 
 function is_in_fighting_boss()
 	useDict(0)
-    print("正在判断是否正在打boss")
-    tingliu({300, 400})
-    local start_time = os.time()
-    while (os.time() - start_time) < 40 do -- 设置最大等待时间为 40 秒
-        类_图色.刷新屏幕()
-        
-        local ret, x, y = find_str(83, 237, 171, 270, "伤害第一可", "EB7F00-101010|CF7000-101010|9C5500-101010|BD6701-101010|8C4C00-050505", 0.9)
-        -- 判断是否存在 "logo1.png"
-        local 设置 = {"logo1.png", 0.8, 522, 14, 578, 70, "101010"}
-
-        if x ~= -1 and y ~= -1 and 类_图色.找图(设置) then
-            print("正在打boss")
+	print("正在判断是否正在打boss")
+	tingliu({300, 400})
+	local start_time = os.time()
+	while (os.time() - start_time) < 40 do -- 设置最大等待时间为 40 秒
+		类_图色.刷新屏幕()
+		
+		local ret, x, y = find_str(83, 237, 171, 270, "伤害第一可", "EB7F00-101010|CF7000-101010|9C5500-101010|BD6701-101010|8C4C00-050505", 0.9)
+		-- 判断是否存在 "logo1.png"
+		local 设置 = {"logo1.png", 0.8, 522, 14, 578, 70, "101010"}
+		
+		if x ~= -1 and y ~= -1 and 类_图色.找图(设置) then
+			print("正在打boss")
             if is_character_dead() then
-                print("角色已死亡，重新开始")
+				print("角色已死亡，重新开始")
                 tingliu({2000,2500})
-                print("重新进入地图")
-                open_challenge_boss()
-                table.insert(stack, "reopen_challenge_boss")
-            else
-                tingliu({1000, 1200})
-                return true
-            end
-        end
-        tingliu({1000, 1200})
-    end
-    print("超时，未找到打boss的特征")
-    return false
+				open_challenge_boss()
+				table.insert(stack, "wait_boss")
+			end
+		end
+		tingliu({1000, 1200})
+	end
+	print("超时，未找到打boss的特征")
+	return false
 end
 
 function is_finish_boss()
@@ -87,53 +139,40 @@ function is_finish_boss()
 	return false
 end
 
+challenge_left = 0
 function open_challenge_boss()
-	
+	useDict(dictIndex)
 	print("执行open_challenge_boss()")
 	tingliu({1500,1800})
 	tap(26,26,1,300,350)
 	tingliu({1000,1200})
 	print("开始操作tiaozhaoboss()")
-    useDict(dictIndex)
     local found = tiaozhaoboss()
-	if not found then --点击挑战Boss
-		tingliu({1500,1700})
-		tap_random(365, 160,2,300,350)       --弹出挑战boss界面后点秘境boss
-	else
-		print("开始操作while not tiaozhaoboss()")
-		while not tiaozhaoboss() do
-			tingliu({1300,1500})
-			tap_random(26,26,1,300,350)
-			tingliu({200,250})
-			tap_random(26,26,1,300,350)
-			tingliu({1300,1500})
-			tap_random(1026,27,1,300,350)
-			tingliu({1300,1500})
-			useDict(dictIndex) -- 使用字典索引
-			tiaozhaoboss()
-			break
-		end
-		tingliu({1300,1500})
-		tap_random(365, 160,2,300,350)  --弹出挑战boss界面后点秘境boss
-	end
+        if found then
+            tingliu({1300, 1500})
+            tap_random(365, 160, 2, 300, 350) -- 弹出挑战 boss 界面后点秘境 boss
+        end
+	tingliu({1300,1500})
+	tap_random(365, 160,2,300,350)  --弹出挑战boss界面后点秘境boss
 	tingliu({1500,1800})
-	
 	local ret, x, y = find_str(955, 144, 1097, 181, "t0|t1|t2|t3|t4|t5", "A87E20-101010|A4A453-101010|DCCC64-101010|B8B69D-101010|E1BF35-101010|B18829-101010|DCBF7A-101010|9B8B6B-101010|896C12-101010|C39E45-404040|EDE198-404040|534223-101010|B9A983-101010|B9A983-101010|9F8F67-505050", 0.86)
 	if x ~= -1 and y ~= -1 then
 		challenge_left = tonumber(ret)
 		print("挑战boss次数为:"..challenge_left)
 		if challenge_left > 0 then
-			haimo()     --点海魔
+			haimo(0)   --点海魔
 			tingliu({1200,1400})
 			tap_random(759, 522,3,300,350)     --点中间
 			return true
 		end
 	else
 		print("识别不了挑战boss次数字符")
+		tingliu({200,300})
+		return false
 	end
-	tingliu({200,300})
-	return false
 end
+
+
 function record_start_feature()     ---识别退出挑战地图
 	print("执行勇者大陆地图识别")
 	setDict(0, "s3.txt")
@@ -150,7 +189,8 @@ function record_start_feature()     ---识别退出挑战地图
 		return false
 	end
 end
-function is_character_dead() ---如果角色死亡点击复活
+
+function is_character_dead(acc) ---如果角色死亡点击复活
 	print("执行判断角色是否死亡")
 	tingliu({1000,1200})
 	local ret, x, y = find_str(691, 426, 784, 453, "原地复活", "C7C9CA-101010|B8B3AD-101010|BAA89A-101010|D3D7DB-101010|A09790-050505", 0.9)
@@ -165,10 +205,10 @@ function is_character_dead() ---如果角色死亡点击复活
 		return true
 	else
 		print("角色未死亡")
-		return false
+		return acc
 	end
+	
 end
-
 function wait_boss()
 	if is_in_fighting_boss() then
 		table.insert(stack, "fighting_boss")
@@ -209,16 +249,6 @@ function finish_boss()
 	table.insert(stack, "wait_boss")
 end
 
--- 角色死亡
---[===[function Emergency_boss()
-	if is_character_dead() then
-		print("角色已死亡，重新进入挑战地图")
-		open_challenge_boss() -- 重新进入挑战地图
-        table.insert(stack, "reopen_challenge_boss")
-	else
-		table.insert(stack, "Emergency_boss")
-	end
-end]===]
 
 -- 判断是否挑战完毕
 function Exit_Challenge_Boss()
@@ -232,27 +262,26 @@ end
 -- 主循环
 open_challenge_boss()
 while #stack > 0 do
-    local state = stack[#stack]
-    print("当前状态：", state)
-    if state == "open_challenge_boss" then
-        open_challenge_boss()
-    elseif state == "wait_boss" then
-        wait_boss()
-    elseif state == "fighting_boss" then
-        fighting_boss()
-    elseif state == "finish_boss" then
-        finish_boss()
-    elseif state == "reopen_challenge_boss" then
-        reopen_challenge_boss()
-    elseif state == "Exit_Challenge_Boss" then
-        Exit_Challenge_Boss()
-    else
-        print("未知状态："..state)
-        break
-    end
-    sleep(2000)
-    table.remove(stack)
+	local state = stack[#stack]
+	print("当前状态：", state)
+	if state == "open_challenge_boss" then
+		open_challenge_boss()
+	elseif state == "wait_boss" then
+		wait_boss()
+	elseif state == "fighting_boss" then
+		fighting_boss()
+	elseif state == "finish_boss" then
+		finish_boss()
+	elseif state == "reopen_challenge_boss" then
+		reopen_challenge_boss()
+	elseif state == "Exit_Challenge_Boss" then
+		Exit_Challenge_Boss()
+	else
+		print("未知状态："..state)
+		break
+	end
+	sleep(2000)
+	table.remove(stack)
 end
-
 
 
