@@ -106,19 +106,54 @@ function xunhuanshangjia()              -------进行循环自动上架总函数
 	print("上架完毕")
 end
 
-function shibiewenzi()     ---识别交易行中的货架数字
-	setDict(0,"s1.txt")
-	useDict(0)
-	local x, y = -1, -1
-	local ret, x, y = findStr(481,189,510,219,"s0|s1|s2|s3|s4|s5|s6","C5CACD-101010|808385-101010|A8ABAE-101010|D6DADE-101010",0.8)
-	if x ~= -1 and y ~= -1 then
-		local num = ret
-		print(num)
-		return num
-	else
-		print("识别不了数字，终止")
+function lijizhuangbei()    --点击立即装备
+	print("执行立即装备")
+	print("字典索引"..dictIndex)
+	useDict(dictIndex)
+	tingliu({3000,3200})
+	repeat
+		local x,y=-1,-1
+		local ret,x,y = findStr(821,575,929,617,"立即装备","A4A4A0-373C44",0.86)
+        print(ret,x,y)
+		if x ~=-1 and y~= -1 then
+			tingliu({1000,1200})
+			tap_random(x,y,1,300,350)
+			tingliu({1000,1200})
+			tap_random(26,26,1,300,350)
+			tingliu({500,600})
+			tap_random(26,26,1,300,350)
+			tingliu({1000,1200})
+		end
+	until x ==-1 and y== -1
+end
+
+function yidonghaidi()  --移动海底
+	print("执行移动海底")
+	print("字典索引"..dictIndex)
+	useDict(dictIndex)
+	tingliu({1100,1300})
+	tap_random(26,26,1,300,350)
+	tingliu({1100,1300})
+	tap_random(1165,79,1,300,350)
+	tingliu({1800,2000})
+	ret,x,y=find_str(283,103,349,130,"地图","ACACAB-101010|9C908E-101010|BDBFBE-101010|84807F-101010|CED2D2-101010",0.8)
+	print(ret,x,y)
+	while x==-1 and y==-1 do
+		tingliu({1500,1700})
+		tap_random(26,26,1,300,350)
+		tingliu({200,250})
+		tap_random(26,26,1,300,350)
+		tingliu({1300,1600})
+		tap_random(1165,79,1,300,350)     --点击地图
+		tingliu({1300,1600})
+		ret,x,y=find_str(283,103,349,130,"地图","ACACAB-101010|9C908E-101010|BDBFBE-101010|84807F-101010|CED2D2-101010",0.8)
+		tingliu({1800,2100})
+		break
 	end
-	
+	tap_random(302,374,1,300,350)   ---点亚特兰蒂斯
+	tingliu({1300,1500})
+	tap_random(525,347,1,300,350)   ---再点亚特兰蒂斯
+	tingliu({1000,1200})
 end
 
 -- 获取网络时间
