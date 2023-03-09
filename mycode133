@@ -1,238 +1,115 @@
-require "懒人综合插件"
-local find_str = function(x1, y1, x2, y2, str, color, sim)
-	return findStr(x1, y1, x2, y2, str, color, sim)
-end
-
-dictIndex = 0
-dictName = "s2.txt"
-setDict(dictIndex, dictName)
-useDict(dictIndex)
-
---[===[function set_dict_files(index, dict_files)  ---设置字库变量
-setDict(index, dict_files)
-useDict(index)
-end]===]
-function tingliu(time)   --随机停留时间tingliu({500,1000}) tingliu({})
-	local randomTime = math.random(time[1], time[2])
-	sleep(randomTime)
-end
-
-function tap_random(x, y, range_percentage, min_duration, max_duration)  --定义随机点击位置和松开时间-tap_random(坐标, 偏移百分比, ,松开时间) tap_random(28, 26,1,300,400)
-	local gesture = Gesture:new() -- 创建一个手势对象
-	local path = Path:new() -- 创建一条路径
-	-- 计算随机偏移的半径
-	local range = math.floor(range_percentage * 0.01 * math.min(x, y))
-	-- 计算随机的坐标
-	local random_x = math.floor(x + 0.5 + math.random(-range, range))
-	local random_y = math.floor(y + 0.5 + math.random(-range, range))
-	-- 计算随机的按下时间
-	local random_duration = math.floor(min_duration + (max_duration - min_duration) * math.random())
-	-- 添加按下和松开的路径
-	path:setStartTime(0)
-	path:setDurTime(random_duration)
-	path:addPoint(random_x, random_y)
-	gesture:addPath(path)
-	
-	function onFinishEvent(type) -- 回调函数
+function challenge_boss()
+	print("执行challenge_boss()")
+	tingliu({1200,1400})
+	if not open_challenge_boss() then
+		return false
 	end
-	
-	local r = gesture:dispatch(onFinishEvent)
-	if r then
-		print("点击成功")
-	else
-		print("执行失败")
+	tingliu({1200,1400})
+	local boss_fight_times = 0
+	local is_finished = false
+	local is_fighting_boss = false
+	local is_boss_finished = false
+	local is_boss_finished_last = false
+	while not is_in_fighting_boss() do
+		tingliu({1000,1200})
 	end
-end
-
-function xunhuanshangjia()              -------进行循环自动上架总函数
-	tingliu{600,800}
-	if yongzhedalu() then   ---移动勇者大陆
-		tingliu({2500,3000})
-		for i=1,1 do
-			clearbeibao()  --清理背包和邮件
+	while not is_finished do
+		tingliu({1000,1200})
+		if not is_fighting_boss or is_in_fighting_boss() then
 			tingliu({1000,1200})
-			lingqumail()
-			tingliu({1000,1200})
-		end
-		tingliu({1000,1300})
-		if myFindStr() then
-			local result = shibiewenzi()
-			if result ~= nil then
-				for i = 1, result do
-					tap_random(280,323,2,300,400)
-					tingliu({1200,1600})
-					xiajia()
-				end
-				if shangjiamoney() then
-					local should_break = false
-					for i = 1, 2 do
-						for j = 1, 2 do
-							local x = x1 + (j - 1) * grid_width + (grid_width / 2)
-							local y = y1 + (i - 1) * grid_height + (grid_height / 2)
-							tingliu({500,700})
-							tap_random(x, y,1,300,400)      --每个格子点击位置
-							tingliu({1500,1800})
-							local found = false
-							tingliu({300,500})
-							for i=1, #jewelry do
-								found = process_jewelry(i)
-								if found then
-									should_break = true
-									break
-								end
-							end
-							if not found then
-								print("不是我要找的")
-								tingliu({1000,1300})
-								tap_random(792, 115,5,300,400)
-							end
-							if found then
-								break
-							end
-						end
-						if found or should_break then
-							break
-						end
-					end
+			is_fighting_boss = true
+			tingliu({500,600})
+			if is_character_dead() then
+				print("重新挑战")
+				tingliu({5000,5200})
+				open_challenge_boss()
+				is_boss_finished_last = false
+				is_boss_finished = false
+				is_fighting_boss = false
+				boss_fight_times = 0
+				while not is_in_fighting_boss() do
+					tingliu({1000,1200})
 				end
 			end
+			is_boss_finished = is_finish_boss(is_boss_finished, is_boss_finished_last)
+			if is_boss_finished and is_fighting_boss then
+				tingliu({1000,1200})
+				if not is_boss_finished_last then
+					tingliu({1000,1200})
+					boss_fight_times = boss_fight_times + 1
+					print("挑战成功："..boss_fight_times)
+					tingliu({1100,1200})
+					if boss_fight_times == challenge_left then
+						if challenge_left == 0 then
+							print("挑战次数已用完，结束挑战")
+							return
+						end
+						print("挑战次数"..challenge_left)
+						print("次数已用完")
+						tingliu({1800,2000})
+						tap_random(26,26,1,300,350)
+						tingliu({300,400})
+						tap_random(26,26,1,300,350)
+						tingliu({1000,1200})
+						tap_random(354,234,1,300,350)
+						tingliu({1000,1200})
+						tap_random(738,417,1,300,350)
+						tingliu({4000,4500})
+						is_finished = true
+					end
+					tingliu({1000,1200})
+					is_boss_finished_last = true
+				end
+			else
+				is_boss_finished_last = false
+				print("未找到boss结束标志")
+				tingliu({500,600})
+			end
+		else
+			tingliu({1600,1800})
+			is_boss_finished = is_finish_boss(is_boss_finished, is_boss_finished_last)
+			if is_fighting_boss and is_boss_finished then
+				tingliu({1000,1200})
+				if not is_boss_finished_last then
+					boss_fight_times = boss_fight_times + 1
+					print("挑战成功："..boss_fight_times)
+					tingliu({1100,1200})
+					if boss_fight_times == challenge_left then
+						
+						print("挑战次数"..challenge_left)
+						print("次数已用完")
+						tingliu({1800,2000})
+						tap_random(26,26,1,300,350)
+						tingliu({300,400})
+						tap_random(26,26,1,300,350)
+						tingliu({1000,1200})
+						tap_random(354,234,1,300,350)
+						tingliu({1000,1200})
+						tap_random(738,417,1,300,350)
+						tingliu({4000,4500})
+						is_finished = true
+					end
+					tingliu({1000,1200})
+					is_boss_finished_last = true
+				end
+			else
+				is_boss_finished_last = false
+				print("未找到boss结束标志")
+				tingliu({1100,1300})
+			end
 		end
-	end
-	tingliu({1800,2000})
-	tap_random(25, 25,2,300,350)
-	tingliu({400,500})
-	tap_random(25, 25,2,300,350)
-	tingliu({2000,2200})
-	print("上架完毕")
-end
-
-function lijizhuangbei()    --点击立即装备
-	print("执行立即装备")
-	print("字典索引"..dictIndex)
-	useDict(dictIndex)
-	tingliu({3000,3200})
-	repeat
-		local x,y=-1,-1
-		local ret,x,y = findStr(821,575,929,617,"立即装备","A4A4A0-373C44",0.86)
-        print(ret,x,y)
-		if x ~=-1 and y~= -1 then
-			tingliu({1000,1200})
-			tap_random(x,y,1,300,350)
-			tingliu({1000,1200})
-			tap_random(26,26,1,300,350)
-			tingliu({500,600})
-			tap_random(26,26,1,300,350)
-			tingliu({1000,1200})
+		if is_character_dead() then
+			print("重新挑战")
+			tingliu({5000,5200})
+			open_challenge_boss()
 		end
-	until x ==-1 and y== -1
-end
-
-function yidonghaidi()  --移动海底
-	print("执行移动海底")
-	print("字典索引"..dictIndex)
-	useDict(dictIndex)
-	tingliu({1100,1300})
-	tap_random(26,26,1,300,350)
-	tingliu({1100,1300})
-	tap_random(1165,79,1,300,350)
-	tingliu({1800,2000})
-	ret,x,y=find_str(283,103,349,130,"地图","ACACAB-101010|9C908E-101010|BDBFBE-101010|84807F-101010|CED2D2-101010",0.8)
-	print(ret,x,y)
-	while x==-1 and y==-1 do
-		tingliu({1500,1700})
-		tap_random(26,26,1,300,350)
-		tingliu({200,250})
-		tap_random(26,26,1,300,350)
-		tingliu({1300,1600})
-		tap_random(1165,79,1,300,350)     --点击地图
-		tingliu({1300,1600})
-		ret,x,y=find_str(283,103,349,130,"地图","ACACAB-101010|9C908E-101010|BDBFBE-101010|84807F-101010|CED2D2-101010",0.8)
-		tingliu({1800,2100})
-		break
+		tingliu({1000,1200})
 	end
-	tap_random(302,374,1,300,350)   ---点亚特兰蒂斯
-	tingliu({1300,1500})
-	tap_random(525,347,1,300,350)   ---再点亚特兰蒂斯
+	tingliu({1000,1200})
+	if is_boss_finished and is_fighting_boss then
+		boss_fight_times = boss_fight_times + 1
+		print("挑战成功："..boss_fight_times)
+		tingliu({1200,1400})
+	end
 	tingliu({1000,1200})
 end
-
--- 获取网络时间
-function get_network_time()
-	return getNetWorkTime()
-end
-
--- 根据网络时间段执行相应的函数
-function execute_function_by_network_time()
-	print("执行分时段移动地图")
-	local current_time_str = get_network_time()
-	print(os.date("The current network time is %Y-%m-%d %H:%M:%S", os.time({year=tonumber(string.sub(current_time_str, 1, 4)), month=tonumber(string.sub(current_time_str, 6, 7)), day=tonumber(string.sub(current_time_str, 9, 10)), hour=tonumber(string.sub(current_time_str, 12, 13)), min=tonumber(string.sub(current_time_str, 15, 16)), sec=tonumber(string.sub(current_time_str, 18, 19))})))
-	local current_hour = tonumber(string.sub(current_time_str, 12, 13))
-	tingliu{1000,1200}
-	if current_hour >= 0 and current_hour < 8 then
-		print("判断时间0-8点")
-		yidonghaidi()
-		tingliu{1000,1200}
-		
-	elseif current_hour >= 8 and current_hour < 16 then
-		print("判断时间8-16点")
-		yidongdixiacheng()
-	else
-		print("判断时间16-0点")
-		tingliu{1000,1200}
-		yidongdishamo()
-	end
-	tingliu({9000,10000})
-	click_random_color()
-end
-
--- 在指定区域随机点击指定颜色
-function click_random_color()
-	local x1, y1, x2, y2 = 981,190,1197,378
-	local color_group = "37C733|36BF32|34B82F|34B72F|38C834|35BA32|3AD336|3AD035|3BD236|3AD135|3AD336"
-	local max_try = 10 -- 最多尝试10次
-	
-	math.randomseed(tostring(os.time()):reverse():sub(1, 11))
-	
-	for i = 1, max_try do
-		local random_x = math.random(x1, x2)
-		local random_y = math.random(y1, y2)
-		local color_num = getColorNum(x1, y1, x2, y2, color_group, 1)
-		if color_num > 0 then
-			tap(random_x, random_y)
-			break
-		end
-	end
-end
-
-function onClickrun()
-	print("请手动点击屏幕以继续...")
-	-- 等待用户点击屏幕
-	tingliu({300,400})
-	local ckId1 = ui.getValue("ckId1")
-	local ckId2 = ui.getValue("ckId2")
-	local ckId3 = ui.getValue("ckId3")
-	ui.dismiss("layout1")
-	clicked = true
-	if ckId1 and not ckId2 and not ckId3 then
-		toast("挑战boss被选中")
-		tingliu({1600,1800})
-		challenge_boss()         --挑战boss
-		tingliu({1600,1800})
-		clearbeibao()            --清理背包
-		tingliu({1600,1800})
-		lingqumail()             --领取邮件
-		tingliu({1600,1800})
-	elseif ckId2 and not ckId1 and not ckId3 then
-		toast("上架产品被选中")
-		tingliu({1600,1800})
-		xunhuanshangjia()        --循环上架产品
-		tingliu({1600,1800})
-		lijizhuangbei()
-		tingliu({1800,2000})
-		execute_function_by_network_time()
-		tingliu（{1800,2000}
-	end
-end
-
-main()
-
