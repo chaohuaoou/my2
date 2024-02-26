@@ -1,141 +1,371 @@
-local boss_name = {"海魔希特拉", "魔王扎坎"}
+以下为服务端代码：
 
-function find_boss_name()    ---定义识别boss名称
-	setDict(0,"s2.txt")
-	useDict(0)
-	local ret,x, y = findStr(45,49,259,107, "海魔希特拉|魔王扎坎","EB2020-101010|B61919-101010|C91C1C-101010|A21717-101010|911414-101010|7F1212-030303",0.8)
-	if x ~= -1 and y ~= -1 then
-    	print("出现boss名称为:"..ret.."已打完该boss")
-		return true
-	else
-    print("未出现boss名称:"..ret)
-		return false
-	end
-end
+from flask import Flask, render_template
+import asyncio
+import websockets
+from threading import Thread
+import json
+import time
 
-function open_challenge_boss()   --打开挑战界面并识别次数进入挑战boss地图
-	setDict(0,"s2.txt")
-	useDict(0)
-	sleep(2000)
-	tap(1025, 101)
-	sleep(2000)
-	tap(372, 157)
-	sleep(2000)
-	local ret, x, y = findStr(955, 144, 1097, 181, "t0|t1|t2|t3|t4|t5", "A87E20-101010|A4A453-101010|DCCC64-101010|B8B69D-101010|E1BF35-101010|B18829-101010|DCBF7A-101010|9B8B6B-101010|896C12-101010|C39E45-404040|EDE198-404040|534223-101010|B9A983-101010|B9A983-101010|9F8F67-505050",0.86)
-	if x ~= -1 and y ~= -1 then
-		local challenge_left = tonumber(ret)
-		print("挑战boss次数为:"..challenge_left)
-		if challenge_left and challenge_left > 0 then
-			tap(293, 288)
-			sleep(1000)
-			tap(542, 522)
-			return true
-		end
-	end
-	sleep(1000)
-	tap(1112, 112)
-	return false
-end
+app = Flask(__name__)
 
-function record_start_feature()     ---识别开始挑战前地图名称
-sleep(2000)
-	setDict(0,"s2.txt")
-	useDict(0)
-	local ret,x, y = findStr(1075,1,1160,28, "勇者大陆","B1B5B8-101010|7B7E80-101010|919496-101010|BBBFC2-101010|B1B5B8-101010|BEC2C6-101010", 0.86)
-	if x ~= -1 and y ~= -1 then
-    print("开始地图为:"..ret)
-		return true
-	else
-		return false
-	end
-end
+clients = {}  # 将clients变量从集合改为字典
+equip_and_diamonds_data = {}  # 存储装备和钻石信息的字典
+processed_clients = set()  # 创建一个新的集合，用于存储已经处理过的客户端的远程地址
 
-function is_in_fighting_boss()   --判断是否正在打boss
-sleep(1000)
-	setDict(0,"s2.txt")
-	useDict(0)
-	local ret ,x, y = findStr(83, 237, 171, 270, "伤害第一可","EB7F00-101010|CF7000-101010|9C5500-101010|BD6701-101010|8C4C00-050505",0.9)
-	if x ~= -1 and y ~= -1 then
-    print("识别到："..ret.."正在打boss")
-		return true
-	else
-		return false
-	end
-    sleep(1000)
-end
 
-function is_finish_boss()  
-sleep(1000) 
-	setDict(0,"s2.txt")
-	useDict(0)
-	local ret,x, y = findStr(45,49,259,107, "海魔希特拉|魔王扎坎","EB2020-101010|B61919-101010|C91C1C-101010|A21717-101010|911414-101010|7F1212-030303",0.8)
-	if x ~= -1 and y ~= -1 then
-    print("识别到名称"..ret.."出现该名称，判断打完boss")
-		return true
-	else
-		return false
-	end
-end
+@app.route('/')
+def index():
+    return render_template('index.html')
 
-function is_character_dead()   ---如果角色死亡点击复活
-	setDict(0,"s2.txt")
-	useDict(0)
-	local ret,x, y = findStr(691, 426, 784, 453, "原地复活","C7C9CA-101010|B8B3AD-101010|BAA89A-101010|D3D7DB-101010|A09790-050505",0.9)
-	if x ~= -1 and y ~= -1 then
-    print("角色死亡点击："..ret)
-		tap(540, 437)
-		sleep(2000)
-		tap(26, 25)
-		sleep(2000)
-		tap(26, 25)
-		sleep(2000)
-		return true
-	else
-		return false
-	end
-end
 
-function challenge_boss()
-	if not open_challenge_boss() then
-		return false
-	end
-	local boss_fight_times = 0
-	while true do
-		if is_in_fighting_boss() then
-			if is_finish_boss() then
-				boss_fight_times = boss_fight_times + 1
-				print("挑战成功："..boss_fight_times)
-				if boss_fight_times == challenge_left then
-					break
-				end
-				sleep(5000)
-				tap(1112, 112)
-				sleep(5000)
-				open_challenge_boss()
-			end
-			setDict(0,"s2.txt")
-			useDict(0)
-			if findStr(691, 426, 784, 453, "原地复活","C7C9CA-101010|B8B3AD-101010|BAA89A-101010|D3D7DB-101010|A09790-050505",0.9) ~= -1 then
-				tap(540, 437)
-				sleep(2000)
-				tap(26, 25)
-				sleep(2000)
-				tap(26, 25)
-				sleep(5000)
-				open_challenge_boss()
-			end
-		end
-        sleep(100)
-	end
-	while true do
-		setDict(0,"s2.txt")
-		useDict(0)
-		if findStr(1075,1,1160,28, "勇者大陆","B1B5B8-101010|7B7E80-101010|919496-101010|BBBFC2-101010|B1B5B8-101010|BEC2C6-101010", 0.86) ~= -1 then
-			print("成功挑战boss，完成")
-			break
-		end
-	end
-end
+async def match_and_send_equip_and_diamonds():
+    # 遍历装备和钻石数据，并匹配与客户端
+    for equip_item in equip_and_diamonds_data.values():
+        number, equip_name = equip_item
+        for client_address, client_info in clients.items():
+            print(f"正在匹配装备 {equip_name} 和数字 {number}")
+            if client_info.get('number') == number and client_address not in processed_clients:
+                response = {'type': 'equipanddiamondsmatches', 'msg': {'number': number, 'equip_name': equip_name}}
+                await send_message_to_client(client_address, response)
+                processed_clients.add(client_address)
+                print(f"Matched client {client_address} with number {number} and {equip_name}")
+    print(f"Matched {len(processed_clients)} clients successfully.")
 
-challenge_left = 5  -- 填写需要挑战的次数
-challenge_boss()  -- 调用主函数进行挑战
+async def reset_all_clients():
+    # 重置每个客户端字典中的 'number' 数据而不是清除整个字典
+    for client in clients.values():
+        client.pop('number', None)  # 移除客户端的 'number' 键值，如果不存在则不做操作
+
+    # 清空 processed_clients 集合
+    processed_clients.clear()
+
+    # 打印重置后状态的日志
+    print("所有客户端匹配数据已重置。")
+    # 不需要打印 clients 字典中的条目数量，因为我们没有清除 clients
+    print(f"processed_clients 集合中的条目数量：{len(processed_clients)}")  # 打印清除后 processed_clients 的信息数量
+
+async def notify_clients(message):
+    if clients:  # 如果有客户端连接
+        payload = json.dumps(message)
+        tasks = [asyncio.create_task(client['websocket'].send(payload)) for client in clients.values()]
+        await asyncio.wait(tasks)
+
+async def register(websocket):
+    clients[websocket.remote_address] = {'websocket': websocket}  # 当新的客户端连接时，为这个客户端创建一个新的字典，并将websocket连接对象存储在这个字典中
+    print(f"New client connected: {websocket.remote_address}")  # 打印一条消息来确认新的客户端已经连接
+    await notify_clients({'type': 'connect', 'msg': f"New client connected: {websocket.remote_address}", 'clientCount': len(clients)}) # 发送给所有客户端
+
+async def unregister(websocket):
+    del clients[websocket.remote_address]  # 当客户端断开连接时，删除这个客户端的字典
+    print(f"Client disconnected: {websocket.remote_address}")  # 打印一条消息来确认新的客户端已经断开
+    await notify_clients({'type': 'disconnect', 'msg': f"Client disconnected: {websocket.remote_address}", 'clientCount': len(clients) })
+    processed_clients.discard(websocket.remote_address)  # 移除断开连接的客户端
+
+async def send_message_to_client(remote_address, message):
+    client = clients.get(remote_address)
+    if client is not None:
+        try:
+            payload = json.dumps(message)  # 确保消息被序列化为JSON字符串
+            await client['websocket'].send(payload)
+            print(f"Message sent to {remote_address}: {message}")  # 打印日志消息
+        except Exception as e:
+            print(f"Error sending message to {remote_address}: {e}")  # 打印错误日志
+
+async def websocket_handler(websocket, path): #发送信息给客户端用
+    matches_count = 0  # 初始时，在函数的最开始初始化计数器
+    await register(websocket)
+    try:
+        async for message in websocket:
+            data = json.loads(message)
+            if data['type'] == 'shangjia':
+                response = {'type': 'shangjia', 'msg': 'zhijieshangjiachibang'}
+                await notify_clients(response)  # 发送给所有客户端
+                print(f"Sent message to Lua client: {response}")
+            elif data['type'] == 'command':
+                response = {'type': 'command', 'msg': data['msg']}
+                await notify_clients(response)  # 发送给所有客户端
+                print(f"Sent command to Lua client: {response}")
+            elif data['type'] == 'number':
+                try:
+                    client_number = int(data['msg'])  # 将接收到的数字转换为整数
+                    clients[websocket.remote_address]['number'] = client_number
+                    #clients[websocket.remote_address]['number'] = data['msg']  # 将客户端发送的消息存储在这个客户端的字典中
+                    print(f"Received number from {websocket.remote_address}: {client_number}")
+                    response = {'type': 'number', 'msg': data['msg']}
+                    await notify_clients(response)
+                except ValueError:
+                    print(f"Invalid number received from {websocket.remote_address}: {data['msg']}")
+
+            elif data['type'] == 'zhaozhuangbeizuanshi':
+                print(f"Received equip and diamonds from {websocket.remote_address}: {data['msg']}")
+                time.sleep(1)
+            elif data['type'] == 'equipanddiamonds':
+                print(f"处理 equipanddiamonds 消息前客户端数量: {len(clients)}")
+                print(f"接收到的装备和钻石数据: {data['msg']}")
+                matches_count = 0  # 在开始新的匹配之前将计数器重置为 0
+                print(f"Received equip and diamonds from {websocket.remote_address}: {data['msg']}")
+                await notify_clients({'type': 'equipanddiamonds', 'msg': data['msg']})
+                print("遍历对比前的客户端信息:")
+                time.sleep(1)
+                for address, info in clients.items():
+                    print(f"地址 {address} 的客户端信息: {info}")
+                for equip_item in data['msg']:
+                    number, equip_name = equip_item
+                    for client_address, client_info in clients.items():
+                        # 打印出使用的装备和数字数据进行对比
+                        print(f"正在匹配装备 {equip_name} 和数字 {number}")
+                        if client_info.get('number') == number and client_address not in processed_clients:
+                            time.sleep(1)
+                            response = {'type': 'equipanddiamondsmatches','msg': {'number': number, 'equip_name': equip_name}}
+                            await send_message_to_client(client_address, response)
+
+                            matches_count += 1  # 增加匹配成功的计数器
+                            print(f"Matched client {client_address} with number {number} and {equip_name}")  # 打印匹配日志
+                            processed_clients.add(client_address)  # 将客户端地址添加到集合中以避免重复发送
+                            break  # 匹配成功后跳出内层循环
+                print(f"Matched {matches_count} clients successfully.")  # 打印匹配成功的客户端数量
+                # 在遍历对比后，打印出已处理的客户端
+                print(f"已处理的客户端: {processed_clients}")
+            elif data['type'] == 'buy_complete':
+
+                client_info = clients.get(websocket.remote_address)
+                if client_info:
+                    # 从客户端信息中获取购买的对应数字
+                    client_number = client_info.get('number', '未知数字')
+                    # 打印购买完成的客户端地址和对应的数字
+                    print(f"购买完成的客户端: {websocket.remote_address} 购买的数字: {client_number}: {data}")
+                    # 发送匹配成功的消息给网页端，指示其删除客户端的number信息
+                    await notify_clients({
+                        'type': 'match_success',
+                        'number': client_number
+                    })
+                    client_number = client_info['number']  # 获取客户端的number信息  # 保存number信息
+
+                    del client_info['number']  # 删除number信息
+                    #processed_clients.add(websocket.remote_address)  # 标记客户端为已处理
+                    await notify_clients({'type': 'buy_complete','msg': f"Client {websocket.remote_address} completed the purchase"})  # 通知所有客户端该客户端完成购买
+
+                    print(f"Client {websocket.remote_address} completed the purchase and has been marked as processed")
+
+            elif data['type'] == 'reset_clients':
+                await reset_all_clients()
+                # 可以通知所有网页端客户端已经重置
+                await notify_clients({'type': 'reset_clients', 'msg': 'All client data has been reset.'})
+    except websockets.exceptions.ConnectionClosed as e:
+        print(f"Client disconnected: {websocket.remote_address}")
+        print(f"WebSocket connection closed with error: {e}")  # 打印连接关闭的错误
+    except Exception as e:
+        # 打印其他所有异常信息
+        print(f"An error occurred: {e}")
+    finally:
+        await unregister(websocket)
+
+
+def run_flask():
+    app.run(host='0.0.0.0', port=5263) # 通过 Flask 运行 Web 应用
+
+
+def run_websocket_server():
+    asyncio.set_event_loop(asyncio.new_event_loop())
+    start_server = websockets.serve(websocket_handler, '0.0.0.0', 8765)
+    asyncio.get_event_loop().run_until_complete(start_server)
+    asyncio.get_event_loop().run_forever()
+
+
+if __name__ == '__main__':
+    # 创建一个线程运行 Flask 应用
+    t1 = Thread(target=run_flask)
+
+    # 创建一个线程运行 WebSocket 服务器
+    t2 = Thread(target=run_websocket_server)
+
+    t1.start()
+    t2.start()
+
+    t1.join()
+    t2.join()
+
+
+
+--------------------------------------------------------------
+以下为网页端代码：
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>WebSocket 控制面板</title>
+  <style>
+     .list-container {
+      display: flex;           /* 使用Flexbox布局 */
+      justify-content: space-between; /* 在列表之间增加空间，使它们分布在两端 */
+    }
+
+    .list-wrapper {
+      flex: 1;                 /* Flex项目将会被允许增长并且占用空间 */
+      display: flex;           /* 设置为Flex容器 */
+      flex-direction: column;  /* 子项垂直排列 */
+    }
+
+    #equip-and-diamonds-list,
+    #client-list {
+      list-style: none;        /* 移除默认的列表样式 */
+      padding: 0;              /* 移除默认的内边距 */
+    }
+
+    #client-list {
+      max-height: 500px;       /* 设置高度 */
+      overflow-y: auto;        /* 如果内容超出高度，则显示垂直滚动条 */
+      margin-left: 10px;       /* 与装备列表增加一些距离 */
+    }
+    #client-count {
+        color: green; /* 文本颜色设置为绿色 */
+        /* 添加其他必要的样式 */
+    }
+
+  </style>
+  <script type="text/javascript">
+    var ws;
+
+        // 定义一个函数来更新客户端数量
+    function updateClientCount(newCount) {
+      var clientCountSpan = document.getElementById('client-count');
+      clientCountSpan.textContent = '客户端数量: ' + newCount;
+    }
+
+    function disableButtonForTime(button, time) { //处理按钮禁用的函数
+      button.disabled = true;
+      setTimeout(function() {
+        button.disabled = false;
+      }, time);
+    }
+
+    function sendMessage(type, msg, buttonId) { // 处理发送消息的函数
+      var button = document.getElementById(buttonId);
+      if (ws && button && !button.disabled) {
+          if (type === 'command' && msg === 'zuanshishuliang') {
+            var numberList = document.getElementById('number-list');
+            numberList.innerHTML = ''; // 清空数字列表
+            }
+        ws.send(JSON.stringify({ type: type, msg: msg }));
+        disableButtonForTime(button, 5000); // Disable the button for 5 seconds (5000 milliseconds)
+      }
+    }
+
+
+    function removeNumberFromList(number) { // 处理删除数字的函数
+      var numberList = document.getElementById('number-list');
+      // assuming that "number" is the text content of the list items
+      for (let item of numberList.children) {
+        //if (item.textContent === number) {
+          if (item.textContent.includes(String(number))) { // 将字符串型的number转化为字符串
+          numberList.removeChild(item);
+          break; // Stop the loop after finding and removing the item
+        }
+      }
+    }
+
+      // 函数用来更新显示数字的列表
+    function updateNumberList(number) {
+      var numberList = document.getElementById('number-list');
+      var item = document.createElement('li');
+      item.textContent = number;
+      numberList.appendChild(item);
+    }
+
+    function updateClientList(message) {
+      var clientList = document.getElementById('client-list');
+      var item = document.createElement('div');
+      item.textContent = message;
+      clientList.appendChild(item);
+    }
+
+    window.onload = function() {
+      // 这里的地址应该指向运行着 WebSocket 的服务器
+      ws = new WebSocket("ws://192.168.22.111:8765");
+
+
+      ws.onopen = function() {
+        console.log("WebSocket 连接已打开");
+      };
+
+      ws.onmessage = function(event) {
+        console.log("从服务器接收到消息: ", event.data);
+
+        try {
+          var data = JSON.parse(event.data);
+
+          // 如果消息带有 'type' 字段
+          if (data.type) {
+            if (data.type === 'connect' || data.type === 'disconnect') {
+              // 连接和断开连接消息
+              updateClientList(data.msg);
+              updateClientCount(data.clientCount);
+            } else if (data.type === 'equipanddiamonds') {
+              // 装备和数量的列表
+              var equipList = document.getElementById('equip-and-diamonds-list');
+              equipList.innerHTML = ''; // 清空现有列表
+
+              data.msg.forEach(function(item) {
+                var quantity = item[0];
+                var equipName = item[1];
+                var listItem = document.createElement('li');
+                listItem.textContent = quantity + ' ' + equipName;
+                equipList.appendChild(listItem);
+              });
+            } else if (data.type === 'number') {
+                // 清空现有数字列表
+                var numberList = document.getElementById('number-list');
+                //numberList.innerHTML = '';
+                // 获取到的数字
+                updateNumberList(data.msg);  // 使用新的函数更新列表
+            } else if (data.type === 'match_success') {
+            // 删除匹配成功的客户端号码
+                removeNumberFromList(data.number);
+            } else if (data.type === 'buy_complete') {
+                // 删除数字
+                removeNumberFromList(data.msg);  // 使用新的函数删除数字
+            }
+            // 可以添加处理其他类型消息的代码
+          }
+
+        } catch (e) {
+          console.error('无法解析服务器消息为JSON对象:', e, event.data);
+        }
+      };
+
+      ws.onclose = function() {
+        console.log("WebSocket 连接已关闭");
+      };
+
+      // 处理错误
+      ws.onerror = function(error) {
+        console.log("WebSocket 错误: " + error);
+      };
+      // 设置初始客户端数量为 0 (如果需要)
+      updateClientCount(0);
+    };
+
+  </script>
+</head>
+<body>
+   <button id="identifyDiamonds" onclick="sendMessage('command', 'zuanshishuliang', 'identifyDiamonds')">识别钻石</button>
+   <button id="identifyEquipDiamonds" onclick="sendMessage('command', 'zhaozhuangbeizuanshi', 'identifyEquipDiamonds')">识别装备和钻石</button>
+   <button id="putOnSale" onclick="sendMessage('shangjia', 'zhijieshangjiachibang', 'putOnSale')">上架</button>
+   <button id="resetClientsButton" onclick="sendMessage('reset_clients', 'reset', 'resetClientsButton')">重置客户端匹配数据</button>
+   <span id="client-count" style="color: green; margin-left: 10px;">客户端数量: 0</span>
+   <div class="list-container">
+      <div class="list-wrapper"> <!-- 包装equip-and-diamonds-list和后面的列表 -->
+        <ul id="equip-and-diamonds-list"></ul>
+        <!-- 这里放置 equip-and-diamonds-list 下面的其他列表 -->
+                <!-- 新增的用于显示 number 的列表 -->
+        <ul id="number-list"></ul>
+      </div>
+      <div class="list-wrapper"> <!-- 包装client-list -->
+        <ul id="client-list"></ul>
+      </div>
+    </div>
+
+
+</body>
+</html>
